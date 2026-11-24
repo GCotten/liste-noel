@@ -1,0 +1,585 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ma liste de Noël</title>
+<meta name="color-scheme" content="light dark">
+<style>
+  /* ===== Thème : couleurs clair / sombre automatiques ===== */
+  :root {
+    --bg: #fbf7f2;
+    --card: #ffffff;
+    --ink: #2a2320;
+    --muted: #6b5f58;
+    --line: #e8dfd5;
+    --red: #b3262d;
+    --red-ink: #ffffff;
+    --green: #1f5a3d;
+    --gold: #b98410;
+    --gold-soft: #f6e9c8;
+    --shadow: 0 2px 10px rgba(60, 30, 20, .08);
+    --radius: 14px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #17120f;
+      --card: #231c18;
+      --ink: #f4ece4;
+      --muted: #b9aca2;
+      --line: #3a2f29;
+      --red: #e0525a;
+      --red-ink: #1a0d0e;
+      --green: #6fc79b;
+      --gold: #e3b750;
+      --gold-soft: #3a2f14;
+      --shadow: 0 2px 10px rgba(0, 0, 0, .4);
+    }
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.5;
+  }
+  a { color: var(--green); }
+  h1, h2, h3 { line-height: 1.2; margin: 0; }
+
+  /* ===== Structure ===== */
+  header.top {
+    background: linear-gradient(135deg, var(--red), #7d1a20);
+    color: #fff;
+    padding: 18px 16px 22px;
+    border-bottom: 4px solid var(--gold);
+  }
+  header.top .inner, main { max-width: 760px; margin: 0 auto; }
+  header.top a.brand {
+    color: #fff; text-decoration: none; font-weight: 700; font-size: 1.15rem;
+    display: inline-flex; gap: 8px; align-items: center;
+  }
+  main { padding: 20px 16px 60px; }
+  footer { text-align: center; color: var(--muted); font-size: .85rem; padding: 0 16px 40px; }
+
+  /* ===== Cartes, formulaires ===== */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 18px;
+    box-shadow: var(--shadow);
+    margin-bottom: 18px;
+  }
+  .card h2 { font-size: 1.2rem; margin-bottom: 4px; }
+  .lead { color: var(--muted); margin: 0 0 14px; }
+  .hero h1 { font-size: 1.7rem; margin-bottom: 6px; }
+  label { display: block; font-weight: 600; font-size: .92rem; margin: 12px 0 4px; }
+  input, textarea, select {
+    width: 100%;
+    font: inherit;
+    color: var(--ink);
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 10px 12px;
+  }
+  textarea { min-height: 70px; resize: vertical; }
+  .row { display: grid; gap: 0 12px; grid-template-columns: 1fr; }
+  @media (min-width: 560px) { .row { grid-template-columns: 1fr 1fr; } }
+  :focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+
+  /* ===== Boutons ===== */
+  .btn {
+    font: inherit; font-weight: 600; cursor: pointer;
+    border: 1px solid var(--line); background: var(--card); color: var(--ink);
+    padding: 10px 16px; border-radius: 10px; text-decoration: none;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn:hover { border-color: var(--gold); }
+  .btn.primary { background: var(--red); color: var(--red-ink); border-color: var(--red); }
+  .btn.primary:hover { filter: brightness(1.08); }
+  .btn.small { padding: 6px 12px; font-size: .9rem; }
+  .btn.danger { color: var(--red); }
+  .btn-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+
+  /* ===== Partage ===== */
+  .share { display: flex; gap: 8px; flex-wrap: wrap; }
+  .share input { flex: 1 1 220px; min-width: 0; font-size: .85rem; }
+  .hint { color: var(--muted); font-size: .88rem; margin: 8px 0 0; }
+
+  /* ===== Liste de cadeaux ===== */
+  ul.gifts { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+  .gift {
+    background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 14px 16px; box-shadow: var(--shadow);
+    display: flex; gap: 12px; justify-content: space-between; flex-wrap: wrap;
+  }
+  .gift .main { flex: 1 1 240px; min-width: 0; }
+  .gift h3 { font-size: 1.05rem; overflow-wrap: anywhere; }
+  .gift p { margin: 4px 0 0; color: var(--muted); overflow-wrap: anywhere; }
+  .gift .meta { margin-top: 6px; font-size: .9rem; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+  .gift .actions { display: flex; gap: 8px; align-items: flex-start; flex-wrap: wrap; }
+  .gift.reserved { opacity: .6; background: var(--bg); }
+  .gift.reserved h3 { text-decoration: line-through; text-decoration-thickness: 1px; }
+  .badge {
+    display: inline-block; font-size: .75rem; font-weight: 700; padding: 2px 9px;
+    border-radius: 999px; margin-left: 6px; vertical-align: middle;
+    background: var(--gold-soft); color: var(--gold); border: 1px solid var(--gold);
+  }
+  .badge.p2 { background: var(--gold); color: var(--bg); }
+  .badge.p3 { background: var(--red); color: var(--red-ink); border-color: var(--red); }
+  .tag-reserved { font-weight: 700; color: var(--green); }
+  .empty { text-align: center; color: var(--muted); padding: 28px 10px; border: 2px dashed var(--line); border-radius: var(--radius); }
+  .banner {
+    background: var(--gold-soft); color: var(--ink); border: 1px solid var(--gold);
+    border-radius: 10px; padding: 10px 14px; margin-bottom: 16px; font-size: .92rem;
+  }
+  .section-title { margin: 26px 0 12px; font-size: 1.15rem; }
+
+  /* ===== Notification ===== */
+  #toast {
+    position: fixed; left: 50%; bottom: 20px; transform: translate(-50%, 20px);
+    background: var(--green); color: var(--bg); padding: 10px 18px; border-radius: 999px;
+    font-weight: 600; opacity: 0; pointer-events: none; transition: .25s; z-index: 10;
+    max-width: calc(100% - 32px); text-align: center;
+  }
+  #toast.show { opacity: 1; transform: translate(-50%, 0); }
+  @media (prefers-reduced-motion: reduce) { #toast { transition: none; } }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="inner"><a class="brand" href="#/">🎄 Ma liste de Noël</a></div>
+</header>
+<main id="app" aria-live="polite"></main>
+<footer>Fait avec ❤️ pour que les cadeaux restent une surprise.</footer>
+<div id="toast" role="status"></div>
+
+<script>
+(() => {
+  'use strict';
+
+  /* =====================================================
+     Stockage (localStorage, avec repli en mémoire)
+     ===================================================== */
+  const mem = {};
+  const store = {
+    get(k, d) {
+      try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; }
+      catch (e) { return k in mem ? mem[k] : d; }
+    },
+    set(k, v) {
+      try { localStorage.setItem(k, JSON.stringify(v)); }
+      catch (e) { mem[k] = v; }
+    }
+  };
+
+  const LISTS_KEY = 'nl_lists';
+  const getLists = () => store.get(LISTS_KEY, []);
+  const saveLists = (l) => store.set(LISTS_KEY, l);
+  const getList = (id) => getLists().find(l => l.id === id);
+  const updateList = (id, fn) => {
+    const lists = getLists();
+    const l = lists.find(x => x.id === id);
+    if (l) { fn(l); saveLists(lists); }
+  };
+  const uid = () => Math.random().toString(36).slice(2, 8) + Date.now().toString(36);
+
+  /* Réservations : stockées dans le navigateur de la personne qui offre */
+  const getRes = (listId) => store.get('nl_res_' + listId, {});
+  const setRes = (listId, r) => store.set('nl_res_' + listId, r);
+
+  /* =====================================================
+     Utilitaires
+     ===================================================== */
+  const $ = (s) => document.querySelector(s);
+  const app = $('#app');
+
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+  const PRIO = { 1: 'Envie', 2: 'Très envie', 3: 'Rêve' };
+
+  const euro = (n) => new Intl.NumberFormat('fr-FR',
+    { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(n);
+
+  /* N'autorise que les liens http(s) : les données d'un lien partagé ne sont pas fiables */
+  function safeUrl(u) {
+    if (!u) return '';
+    try {
+      const url = new URL(u.trim());
+      return (url.protocol === 'http:' || url.protocol === 'https:') ? url.href : '';
+    } catch (e) { return ''; }
+  }
+
+  let toastTimer;
+  function toast(msg) {
+    const t = $('#toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+  }
+
+  async function copyText(text) {
+    try { await navigator.clipboard.writeText(text); return true; }
+    catch (e) {
+      const i = $('#share-input');
+      if (i) { i.select(); try { return document.execCommand('copy'); } catch (_) {} }
+      return false;
+    }
+  }
+
+  /* =====================================================
+     Lien de partage : la liste est encodée dans l'adresse
+     ===================================================== */
+  function encode(obj) {
+    const bytes = new TextEncoder().encode(JSON.stringify(obj));
+    let s = '';
+    bytes.forEach(b => s += String.fromCharCode(b));
+    return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  }
+  function decode(str) {
+    str = str.replace(/-/g, '+').replace(/_/g, '/');
+    while (str.length % 4) str += '=';
+    const bin = atob(str);
+    const bytes = Uint8Array.from(bin, c => c.charCodeAt(0));
+    return JSON.parse(new TextDecoder().decode(bytes));
+  }
+
+  const toPayload = (l) => ({
+    v: 1, id: l.id, t: l.titre, o: l.prenom, m: l.message,
+    g: l.gifts.map(g => ({ i: g.id, n: g.nom, d: g.desc, l: g.lien, p: g.prix, r: g.prio }))
+  });
+
+  /* Nettoie les données reçues par lien */
+  function clean(d) {
+    if (!d || typeof d !== 'object' || !Array.isArray(d.g)) throw new Error('invalide');
+    const str = (v, n) => String(v ?? '').slice(0, n);
+    return {
+      id: str(d.id, 40), t: str(d.t, 120), o: str(d.o, 60), m: str(d.m, 500),
+      g: d.g.slice(0, 200).map(g => ({
+        i: str(g.i, 40), n: str(g.n, 120), d: str(g.d, 400), l: safeUrl(str(g.l, 600)),
+        p: (g.p === '' || g.p == null || isNaN(+g.p)) ? '' : Math.max(0, +g.p),
+        r: [1, 2, 3].includes(+g.r) ? +g.r : 1
+      }))
+    };
+  }
+
+  const shareUrl = (l) =>
+    location.href.split('#')[0] + '#/partage/' + encode(toPayload(l));
+
+  /* =====================================================
+     Données de démonstration (au premier lancement)
+     ===================================================== */
+  if (!store.get('nl_seeded', false)) {
+    saveLists([{
+      id: 'demo',
+      titre: 'Noël chez Camille',
+      prenom: 'Camille',
+      message: 'Coucou ! Voici quelques idées si vous cherchez l’inspiration. Merci à vous 🎅',
+      gifts: [
+        { id: 'g1', nom: 'Plaid en laine', desc: 'Gris chiné ou vert sapin, bien épais.', lien: '', prix: 45, prio: 2 },
+        { id: 'g2', nom: 'Coffret de thés', desc: 'Idéalement avec des saveurs d’hiver.', lien: '', prix: 25, prio: 1 },
+        { id: 'g3', nom: 'Casque audio sans fil', desc: 'Réduction de bruit si possible.', lien: 'https://example.com', prix: 120, prio: 3 },
+        { id: 'g4', nom: 'Roman policier', desc: 'Un bon polar pour les vacances.', lien: '', prix: 9, prio: 1 }
+      ]
+    }]);
+    store.set('nl_seeded', true);
+  }
+
+  /* =====================================================
+     Vues
+     ===================================================== */
+  let editingId = null;
+
+  function giftFormHtml(editing) {
+    const g = editing || {};
+    return `
+      <form data-form="gift" novalidate>
+        <label for="g-nom">Nom du cadeau *</label>
+        <input id="g-nom" name="nom" required maxlength="120" value="${esc(g.nom)}" placeholder="Ex : Plaid en laine">
+        <label for="g-desc">Description courte</label>
+        <textarea id="g-desc" name="desc" maxlength="400" placeholder="Couleur, taille, marque…">${esc(g.desc)}</textarea>
+        <label for="g-lien">Lien vers un produit</label>
+        <input id="g-lien" name="lien" type="url" inputmode="url" value="${esc(g.lien)}" placeholder="https://…">
+        <div class="row">
+          <div>
+            <label for="g-prix">Prix approximatif (€)</label>
+            <input id="g-prix" name="prix" type="number" min="0" step="1" inputmode="numeric" value="${esc(g.prix)}">
+          </div>
+          <div>
+            <label for="g-prio">Priorité</label>
+            <select id="g-prio" name="prio">
+              ${[1, 2, 3].map(n => `<option value="${n}" ${(g.prio || 1) === n ? 'selected' : ''}>${PRIO[n]}</option>`).join('')}
+            </select>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn primary" type="submit">${editing ? 'Enregistrer' : 'Ajouter à ma liste'}</button>
+          ${editing ? '<button class="btn" type="button" data-action="cancel-edit">Annuler</button>' : ''}
+        </div>
+      </form>`;
+  }
+
+  function renderHome() {
+    const lists = getLists();
+    app.innerHTML = `
+      <section class="card hero">
+        <h1>Une liste de Noël à partager 🎁</h1>
+        <p class="lead">Crée ta liste, envoie le lien à tes proches : ils peuvent réserver un cadeau sans que tu saches lequel.</p>
+        <form data-form="create-list" novalidate>
+          <label for="l-titre">Titre de la liste *</label>
+          <input id="l-titre" name="titre" required maxlength="120" placeholder="Ex : Noël 2026">
+          <label for="l-prenom">Ton prénom *</label>
+          <input id="l-prenom" name="prenom" required maxlength="60" autocomplete="given-name">
+          <label for="l-msg">Message d’accueil</label>
+          <textarea id="l-msg" name="message" maxlength="500" placeholder="Un petit mot pour tes proches…"></textarea>
+          <div class="btn-row"><button class="btn primary" type="submit">Créer ma liste</button></div>
+        </form>
+      </section>
+      ${lists.length ? `
+        <h2 class="section-title">Mes listes</h2>
+        <ul class="gifts">
+          ${lists.map(l => `
+            <li class="gift">
+              <div class="main">
+                <h3>${esc(l.titre)}</h3>
+                <p>${esc(l.prenom)} · ${l.gifts.length} cadeau${l.gifts.length > 1 ? 'x' : ''}</p>
+              </div>
+              <div class="actions"><a class="btn small primary" href="#/liste/${esc(l.id)}">Ouvrir</a></div>
+            </li>`).join('')}
+        </ul>` : ''}`;
+  }
+
+  function renderOwner(l) {
+    const editing = l.gifts.find(g => g.id === editingId);
+    app.innerHTML = `
+      <p><a href="#/">← Mes listes</a></p>
+      <section class="card">
+        <h2>${esc(l.titre)}</h2>
+        <p class="lead">Liste de ${esc(l.prenom)}${l.message ? ' · ' + esc(l.message) : ''}</p>
+        <label for="share-input">Lien à envoyer à tes proches</label>
+        <div class="share">
+          <input id="share-input" readonly value="${esc(shareUrl(l))}">
+          <button class="btn primary" data-action="copy">Copier le lien</button>
+        </div>
+        <p class="hint">Le lien contient ta liste : si tu la modifies, renvoie le nouveau lien. Tes réservations restent secrètes : tu ne verras jamais qui offre quoi.</p>
+        <div class="btn-row">
+          <a class="btn small" href="#/apercu/${esc(l.id)}">👀 Aperçu côté proche</a>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>${editing ? 'Modifier le cadeau' : 'Ajouter un cadeau'}</h2>
+        ${giftFormHtml(editing)}
+      </section>
+
+      <h2 class="section-title">Mes cadeaux (${l.gifts.length})</h2>
+      ${l.gifts.length ? `<ul class="gifts">${l.gifts.map(g => giftItemOwner(g)).join('')}</ul>`
+        : '<div class="empty">Ta liste est vide pour l’instant. Ajoute ton premier souhait ci-dessus ✨</div>'}
+
+      <div class="btn-row"><button class="btn danger small" data-action="delete-list">Supprimer cette liste</button></div>`;
+  }
+
+  function giftMeta(g) {
+    const url = safeUrl(g.lien);
+    const price = (g.prix === '' || g.prix == null) ? '' : `<span>${euro(g.prix)}</span>`;
+    const link = url ? `<a href="${esc(url)}" target="_blank" rel="noopener noreferrer">Voir le produit ↗</a>` : '';
+    return (price || link) ? `<div class="meta">${price}${link}</div>` : '';
+  }
+
+  function giftItemOwner(g) {
+    return `
+      <li class="gift">
+        <div class="main">
+          <h3>${esc(g.nom)}<span class="badge p${g.prio}">${PRIO[g.prio]}</span></h3>
+          ${g.desc ? `<p>${esc(g.desc)}</p>` : ''}
+          ${giftMeta(g)}
+        </div>
+        <div class="actions">
+          <button class="btn small" data-action="edit" data-id="${esc(g.id)}" aria-label="Modifier ${esc(g.nom)}">Modifier</button>
+          <button class="btn small danger" data-action="delete" data-id="${esc(g.id)}" aria-label="Supprimer ${esc(g.nom)}">Supprimer</button>
+        </div>
+      </li>`;
+  }
+
+  /* Vue "proche" : liste en lecture seule + réservation */
+  let guestData = null;
+  function renderGuest(d, mode) {
+    guestData = { d, mode };
+    const res = getRes(d.id);
+    const me = (store.get('nl_prenom', '') || '').trim();
+    const items = d.g.map(g => {
+      const by = res[g.i];
+      const mine = by && me && by.toLowerCase() === me.toLowerCase();
+      const url = safeUrl(g.l);
+      const price = (g.p === '' || g.p == null) ? '' : `<span>${euro(g.p)}</span>`;
+      const link = url ? `<a href="${esc(url)}" target="_blank" rel="noopener noreferrer">Voir le produit ↗</a>` : '';
+      return `
+        <li class="gift ${by ? 'reserved' : ''}">
+          <div class="main">
+            <h3>${esc(g.n)}<span class="badge p${g.r}">${PRIO[g.r]}</span></h3>
+            ${g.d ? `<p>${esc(g.d)}</p>` : ''}
+            ${(price || link) ? `<div class="meta">${price}${link}</div>` : ''}
+            ${by ? `<div class="meta"><span class="tag-reserved">🎁 Réservé par ${esc(by)}</span></div>` : ''}
+          </div>
+          <div class="actions">
+            ${!by ? `<button class="btn small primary" data-action="reserve" data-id="${esc(g.i)}">Je l’offre</button>` : ''}
+            ${mine ? `<button class="btn small" data-action="unreserve" data-id="${esc(g.i)}">Annuler</button>` : ''}
+          </div>
+        </li>`;
+    }).join('');
+
+    app.innerHTML = `
+      ${mode === 'preview' ? `<div class="banner">👀 Aperçu : voici ce que verront tes proches. <a href="#/liste/${esc(d.id)}">← Retour à ma liste</a></div>` : ''}
+      <section class="card hero">
+        <h1>${esc(d.t || 'Liste de Noël')}</h1>
+        <p class="lead">Liste de ${esc(d.o)}${d.m ? '' : ''}</p>
+        ${d.m ? `<p>${esc(d.m)}</p>` : ''}
+      </section>
+      <section class="card">
+        <label for="guest-name" style="margin-top:0">Ton prénom (pour réserver un cadeau)</label>
+        <input id="guest-name" maxlength="60" autocomplete="given-name" value="${esc(me)}" placeholder="Ex : Julie">
+        <p class="hint">${esc(d.o)} ne verra pas qui a réservé quoi. Les cadeaux réservés sont grisés pour éviter les doublons.</p>
+      </section>
+      ${d.g.length ? `<ul class="gifts">${items}</ul>` : '<div class="empty">Cette liste est vide pour le moment.</div>'}
+      <p class="hint" style="margin-top:18px">Les réservations sont enregistrées sur cet appareil uniquement.</p>`;
+  }
+
+  function renderNotFound(badLink) {
+    app.innerHTML = `
+      <section class="card">
+        <h2>${badLink ? 'Ce lien de partage semble incomplet' : 'Liste introuvable'}</h2>
+        <p class="lead">${badLink ? 'Demande à la personne de te renvoyer le lien complet.' : 'Cette liste n’existe pas sur cet appareil.'}</p>
+        <a class="btn primary" href="#/">Retour à l’accueil</a>
+      </section>`;
+  }
+
+  /* =====================================================
+     Routage (par l'adresse après le #)
+     ===================================================== */
+  function route() {
+    const h = location.hash || '';
+    let m;
+    if ((m = h.match(/^#\/liste\/(.+)$/))) {
+      const l = getList(m[1]);
+      return l ? renderOwner(l) : renderNotFound();
+    }
+    if ((m = h.match(/^#\/apercu\/(.+)$/))) {
+      const l = getList(m[1]);
+      return l ? renderGuest(clean(toPayload(l)), 'preview') : renderNotFound();
+    }
+    if ((m = h.match(/^#\/partage\/(.+)$/))) {
+      try {
+        const d = clean(decode(m[1]));
+        /* Si c'est ta propre liste, on t'affiche la vue propriétaire : la surprise est gardée */
+        if (getList(d.id)) { location.replace('#/liste/' + d.id); return; }
+        return renderGuest(d, 'shared');
+      } catch (e) { return renderNotFound(true); }
+    }
+    editingId = null;
+    renderHome();
+  }
+
+  /* =====================================================
+     Interactions
+     ===================================================== */
+  app.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const f = e.target;
+    const data = Object.fromEntries(new FormData(f));
+    const kind = f.dataset.form;
+
+    if (kind === 'create-list') {
+      const titre = (data.titre || '').trim();
+      const prenom = (data.prenom || '').trim();
+      if (!titre || !prenom) { toast('Titre et prénom sont obligatoires'); (titre ? f.prenom : f.titre).focus(); return; }
+      const l = { id: uid(), titre, prenom, message: (data.message || '').trim(), gifts: [] };
+      saveLists([...getLists(), l]);
+      location.hash = '#/liste/' + l.id;
+    }
+
+    if (kind === 'gift') {
+      const id = (location.hash.match(/^#\/liste\/(.+)$/) || [])[1];
+      const nom = (data.nom || '').trim();
+      if (!nom) { toast('Donne un nom à ton cadeau'); f.nom.focus(); return; }
+      const lien = (data.lien || '').trim();
+      if (lien && !safeUrl(lien)) { toast('Le lien doit commencer par http:// ou https://'); f.lien.focus(); return; }
+      const gift = {
+        nom, desc: (data.desc || '').trim(), lien: safeUrl(lien),
+        prix: data.prix === '' ? '' : Math.max(0, Number(data.prix)),
+        prio: [1, 2, 3].includes(+data.prio) ? +data.prio : 1
+      };
+      updateList(id, (l) => {
+        if (editingId) {
+          const g = l.gifts.find(x => x.id === editingId);
+          if (g) Object.assign(g, gift);
+        } else {
+          l.gifts.push({ id: uid(), ...gift });
+        }
+      });
+      toast(editingId ? 'Cadeau modifié ✔' : 'Cadeau ajouté ✔');
+      editingId = null;
+      route();
+    }
+  });
+
+  app.addEventListener('input', (e) => {
+    if (e.target.id === 'guest-name') store.set('nl_prenom', e.target.value);
+  });
+
+  app.addEventListener('click', async (e) => {
+    const b = e.target.closest('[data-action]');
+    if (!b) return;
+    const act = b.dataset.action;
+    const listId = (location.hash.match(/^#\/liste\/(.+)$/) || [])[1];
+
+    if (act === 'copy') {
+      const l = getList(listId);
+      toast(await copyText(shareUrl(l)) ? 'Lien copié 📋' : 'Sélectionne le lien et copie-le');
+    }
+    if (act === 'edit') { editingId = b.dataset.id; route(); $('#g-nom')?.focus(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+    if (act === 'cancel-edit') { editingId = null; route(); }
+    if (act === 'delete') {
+      if (confirm('Supprimer ce cadeau de ta liste ?')) {
+        updateList(listId, l => { l.gifts = l.gifts.filter(g => g.id !== b.dataset.id); });
+        toast('Cadeau supprimé');
+        route();
+      }
+    }
+    if (act === 'delete-list') {
+      if (confirm('Supprimer définitivement cette liste ?')) {
+        saveLists(getLists().filter(l => l.id !== listId));
+        location.hash = '#/';
+      }
+    }
+    if (act === 'reserve') {
+      const input = $('#guest-name');
+      const name = (input.value || '').trim();
+      if (!name) { toast('Indique ton prénom pour réserver'); input.focus(); return; }
+      store.set('nl_prenom', name);
+      const r = getRes(guestData.d.id);
+      if (r[b.dataset.id]) { toast('Déjà réservé !'); return; }
+      r[b.dataset.id] = name;
+      setRes(guestData.d.id, r);
+      toast('Merci ' + name + ' ! Cadeau réservé 🎁');
+      renderGuest(guestData.d, guestData.mode);
+    }
+    if (act === 'unreserve') {
+      const r = getRes(guestData.d.id);
+      delete r[b.dataset.id];
+      setRes(guestData.d.id, r);
+      toast('Réservation annulée');
+      renderGuest(guestData.d, guestData.mode);
+    }
+  });
+
+  window.addEventListener('hashchange', () => { editingId = null; route(); window.scrollTo(0, 0); });
+  route();
+})();
+</script>
+</body>
+</html>
