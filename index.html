@@ -114,7 +114,8 @@
   .badge.p2 { background: var(--gold); color: var(--bg); }
   .badge.p3 { background: var(--red); color: var(--red-ink); border-color: var(--red); }
   .tag-reserved { font-weight: 700; color: var(--green); }
-  .empty { text-align: center; color: var(--muted); padding: 28px 10px; border: 2px dashed var(--line); border-radius: var(--radius); }
+  .empty { text-align: center; color: var(--muted); padding: 28px 10px; border: 2px dashed var(--line);
+           border-radius: var(--radius); background: var(--card); }
   .banner { background: var(--gold-soft); color: var(--ink); border: 1px solid var(--gold);
             border-radius: 10px; padding: 10px 14px; margin-bottom: 16px; font-size: .92rem; }
   .section-title { margin: 26px 0 12px; font-size: 1.15rem; }
@@ -160,7 +161,8 @@ const firebaseConfig = {
 };
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut }
+import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut,
+         deleteUser, reauthenticateWithPopup }
   from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import { getFirestore, collection, doc, addDoc, setDoc, getDoc, getDocs, updateDoc, deleteDoc,
          query, where, orderBy, onSnapshot, arrayUnion, arrayRemove }
@@ -291,7 +293,27 @@ function routeProfile() {
           ${first ? '' : '<a class="btn" href="#/">Annuler</a>'}
         </div>
       </form>
-    </section>`;
+    </section>
+    ${first ? '' : `
+    <section class="card">
+      <h2>Supprimer mon compte</h2>
+      <p class="lead">Efface définitivement ton compte et tes données de l’application. Cette action est irréversible.</p>
+      <button class="btn danger" type="button" data-action="open-delete-account">Supprimer mon compte</button>
+    </section>
+    <dialog id="delete-account-dialog" aria-labelledby="del-title">
+      <h2 id="del-title">Supprimer mon compte ?</h2>
+      <p class="lead">Cela supprimera définitivement :</p>
+      <ul>
+        <li>tes listes et tous leurs cadeaux ;</li>
+        <li>tes réservations sur les listes des autres ;</li>
+        <li>ton nom et ton accès à l’application.</li>
+      </ul>
+      <p class="hint">Google te demandera de confirmer ta connexion. Cette action ne peut pas être annulée.</p>
+      <div class="btn-row">
+        <button class="btn primary" type="button" id="del-confirm" data-action="delete-account">Supprimer définitivement</button>
+        <button class="btn" type="button" data-action="close-dialog">Annuler</button>
+      </div>
+    </dialog>`}`;
   $('#p-name').focus();
 }
 
@@ -606,6 +628,35 @@ function resetGiftForm() {
   $('#form-title').textContent = 'Ajouter un cadeau';
 }
 
+/* Supprime une liste avec ses cadeaux et les réservations associées (l'identifiant d'une réservation = celui du cadeau) */
+async function deleteListCascade(listId) {
+  const gifts = await getDocs(collection(db, 'lists', listId, 'gifts'));
+  await Promise.all(gifts.docs.flatMap(d => [
+    deleteDoc(doc(db, 'lists', listId, 'reservations', d.id)),
+    deleteDoc(d.ref)
+  ]));
+  await deleteDoc(doc(db, 'lists', listId));
+}
+
+/* Suppression des données de l'utilisateur connecté (avant la suppression de son compte Google/Firebase) */
+async function deleteAccountData() {
+  const uid = user.uid;
+  // 1) ses propres listes
+  const mine = await getDocs(query(collection(db, 'lists'), where('ownerUid', '==', uid)));
+  for (const d of mine.docs) await deleteListCascade(d.id);
+  // 2) listes des autres : ses réservations, puis son accès (au mieux : on continue en cas d'échec)
+  const shared = await getDocs(query(collection(db, 'lists'), where('allowedUids', 'array-contains', uid)));
+  for (const d of shared.docs) {
+    try {
+      const res = await getDocs(collection(db, 'lists', d.id, 'reservations'));
+      await Promise.all(res.docs.filter(r => r.data().byUid === uid).map(r => deleteDoc(r.ref)));
+      await updateDoc(d.ref, { allowedUids: arrayRemove(uid) });
+    } catch (e) { /* on passe à la liste suivante */ }
+  }
+  // 3) son profil (nom affiché)
+  await deleteDoc(doc(db, 'users', uid));
+}
+
 app.addEventListener('submit', async (e) => {
   e.preventDefault();
   const f = e.target, kind = f.dataset.form, data = Object.fromEntries(new FormData(f));
@@ -741,10 +792,22 @@ document.addEventListener('click', async (e) => {
       toast('Cadeau supprimé');
     }
     if (act === 'delete-list' && confirm('Supprimer définitivement cette liste ?')) {
-      const gifts = await getDocs(collection(db, 'lists', currentListId, 'gifts'));
-      await Promise.all(gifts.docs.map(d => deleteDoc(d.ref)));
-      await deleteDoc(doc(db, 'lists', currentListId));
+      await deleteListCascade(currentListId);
       location.hash = '#/';
+    }
+    if (act === 'open-delete-account') $('#delete-account-dialog').showModal();
+    if (act === 'delete-account') {
+      const label = b.textContent;
+      b.disabled = true; b.textContent = 'Suppression…';
+      const restore = () => { b.disabled = false; b.textContent = label; };
+      try {   // 1) Google redemande la connexion : confirme que c'est bien la bonne personne
+        await reauthenticateWithPopup(auth.currentUser, new GoogleAuthProvider());
+      } catch (err) { restore(); toast('Confirmation Google impossible : compte conservé'); return; }
+      try {   // 2) données, puis 3) compte
+        await deleteAccountData();
+        await deleteUser(auth.currentUser);
+        location.hash = '#/';
+      } catch (err) { restore(); toast('Suppression impossible pour le moment, réessaie'); }
     }
     if (act === 'reserve') {
       try {
