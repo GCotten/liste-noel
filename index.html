@@ -32,7 +32,7 @@
   header.top .inner { max-width: 760px; margin: 0 auto; display: flex; justify-content: space-between;
                       align-items: center; gap: 12px; flex-wrap: wrap; }
   header.top a.brand { color: #fff; text-decoration: none; font-weight: 700; font-size: 1.15rem; }
-  #authbar { display: flex; gap: 10px; align-items: center; font-size: .9rem; }
+  #authbar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
   #authbar .btn { background: rgba(255,255,255,.15); color: #fff; border-color: rgba(255,255,255,.4); }
   main { max-width: 760px; margin: 0 auto; padding: 20px 16px 60px; }
   footer { text-align: center; color: var(--muted); font-size: .85rem; padding: 0 16px 40px; }
@@ -45,6 +45,7 @@
   label { display: block; font-weight: 600; font-size: .92rem; margin: 12px 0 4px; }
   input, textarea, select { width: 100%; font: inherit; color: var(--ink); background: var(--bg);
           border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
+  input[type=checkbox] { width: 20px; height: 20px; padding: 0; accent-color: var(--red); flex: none; }
   textarea { min-height: 70px; resize: vertical; }
   .row { display: grid; gap: 0 12px; grid-template-columns: 1fr; }
   @media (min-width: 560px) { .row { grid-template-columns: 1fr 1fr; } }
@@ -64,6 +65,15 @@
   .share { display: flex; gap: 8px; flex-wrap: wrap; }
   .share input { flex: 1 1 220px; min-width: 0; font-size: .85rem; }
   .hint { color: var(--muted); font-size: .88rem; margin: 8px 0 0; }
+
+  /* Choix des personnes qui ont accès */
+  ul.people { list-style: none; padding: 0; margin: 10px 0 0; display: grid; gap: 4px;
+              max-height: 280px; overflow-y: auto; border: 1px solid var(--line); border-radius: 10px; }
+  ul.people li { margin: 0; }
+  label.person { display: flex; gap: 12px; align-items: center; margin: 0; padding: 10px 12px;
+                 font-weight: 500; font-size: 1rem; cursor: pointer; }
+  label.person:hover { background: var(--gold-soft); }
+  .people-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
 
   ul.gifts { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
   .gift { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
@@ -110,8 +120,6 @@
 <script type="module">
 /* =====================================================
    1) CONFIGURATION FIREBASE
-   Remplace les valeurs ci-dessous par celles de ta console Firebase
-   (Paramètres du projet > Tes applications > Configuration SDK).
    ===================================================== */
 const firebaseConfig = {
   apiKey: "AIzaSyC6phXoyeoOdBmYCZ0_IUh3fwYNNpmdDDM",
@@ -123,10 +131,10 @@ const firebaseConfig = {
 };
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signInAnonymously, signOut }
+import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut }
   from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import { getFirestore, collection, doc, addDoc, setDoc, getDoc, getDocs, updateDoc, deleteDoc,
-         query, where, orderBy, onSnapshot }
+         query, where, orderBy, onSnapshot, arrayUnion, arrayRemove }
   from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
 const configured = !String(firebaseConfig.apiKey).startsWith('COLLE');
@@ -161,93 +169,123 @@ async function copyText(text) {
   try { await navigator.clipboard.writeText(text); return true; }
   catch (e) { const i = $('#share-input'); if (i) { i.select(); try { return document.execCommand('copy'); } catch (_) {} } return false; }
 }
-/* Prénom mémorisé sur l'appareil (confort de saisie) */
-const getName = () => { try { return localStorage.getItem('nl_prenom') || ''; } catch (e) { return ''; } };
-const setName = (v) => { try { localStorage.setItem('nl_prenom', v); } catch (e) {} };
 
 const GOOGLE_LOGO = `<svg class="g-logo" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.6 5.9c4.4-4.1 7-10.1 7-17.6z"/><path fill="#FBBC05" d="M10.5 28.7A14.5 14.5 0 0 1 9.5 24c0-1.6.3-3.2.8-4.7l-7.9-6.1A24 24 0 0 0 0 24c0 3.9.9 7.5 2.6 10.8l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.6-5.9c-2.1 1.4-4.8 2.3-8.3 2.3-6.3 0-11.6-4.1-13.5-9.8l-7.9 6.1C6.5 42.6 14.6 48 24 48z"/></svg>`;
 
 /* =====================================================
    3) ÉTAT
    ===================================================== */
-let user = null;                 // utilisateur Firebase (Google ou anonyme)
+let user = null;                 // utilisateur Google connecté
+let profile = null;              // { name } : le nom choisi par l'utilisateur
+let profileFailed = false;
+let usersById = {};              // uid -> nom choisi (annuaire des utilisateurs)
 let unsubs = [];                 // abonnements temps réel à fermer à chaque changement de page
 let routeToken = 0;              // évite d'afficher une page périmée
 let currentListId = null;
+let currentAllowed = new Set();
 let currentGifts = [];
 let currentRes = {};
 let editingId = null;
 let guestPreview = false;
-const isGoogle = (u) => !!u && !u.isAnonymous;
 const clearSubs = () => { unsubs.forEach(u => u()); unsubs = []; };
 const shareUrl = (id) => location.href.split('#')[0] + '#/l/' + id;
 
+async function loadUsers() {
+  const s = await getDocs(collection(db, 'users'));
+  usersById = {};
+  s.docs.forEach(d => { usersById[d.id] = String(d.data().name || 'Sans nom'); });
+}
+
 function renderAuthBar() {
-  $('#authbar').innerHTML = isGoogle(user)
-    ? `<span>${esc(user.displayName || user.email || 'Connecté')}</span>
+  $('#authbar').innerHTML = (user && profile)
+    ? `<a class="btn small" href="#/profil" title="Modifier mon nom">👤 ${esc(profile.name)}</a>
        <button class="btn small" data-action="logout">Se déconnecter</button>`
-    : '';
+    : (user ? `<button class="btn small" data-action="logout">Se déconnecter</button>` : '');
 }
 
 /* =====================================================
    4) VUES
    ===================================================== */
 function renderSetup() {
-  app.innerHTML = `
-    <section class="card">
-      <h2>Dernière étape : relier ton projet Firebase</h2>
-      <p class="lead">Ouvre le fichier <code>index.html</code> et remplace le bloc <code>firebaseConfig</code> (en haut du script) par celui de ta console Firebase.</p>
-      <ol class="steps">
-        <li>Console Firebase &gt; Paramètres du projet &gt; Tes applications &gt; application Web.</li>
-        <li>Copie la « Configuration SDK » et colle-la à la place des valeurs d'exemple.</li>
-        <li>Active Authentication (Google + Anonyme) et Firestore, puis publie les règles de sécurité.</li>
-      </ol>
-    </section>`;
+  app.innerHTML = `<section class="card"><h2>Configuration manquante</h2>
+    <p class="lead">Renseigne le bloc <code>firebaseConfig</code> en haut du script de <code>index.html</code>.</p></section>`;
 }
 function renderError(msg) {
   app.innerHTML = `<section class="card"><h2>Oups</h2><p class="lead">${esc(msg)}</p><a class="btn primary" href="#/">Retour à l’accueil</a></section>`;
 }
-function renderNotFound() {
-  app.innerHTML = `<section class="card"><h2>Liste introuvable</h2>
-    <p class="lead">Ce lien ne correspond à aucune liste. Demande à la personne de te le renvoyer.</p>
+function renderNoAccess() {
+  app.innerHTML = `<section class="card"><h2>Accès non autorisé</h2>
+    <p class="lead">Cette liste n’existe pas, ou son propriétaire ne t’y a pas donné accès. Tu peux lui demander de t’ajouter : tu apparais sous le nom <strong>${esc(profile?.name || '')}</strong>.</p>
     <a class="btn primary" href="#/">Retour à l’accueil</a></section>`;
 }
 function renderLogin(texte) {
   app.innerHTML = `
     <section class="card hero">
       <h1>Une liste de Noël à partager 🎁</h1>
-      <p class="lead">${esc(texte || 'Crée ta liste, envoie le lien à tes proches : ils réservent un cadeau sans que tu saches lequel.')}</p>
+      <p class="lead">${esc(texte || 'Crée ta liste, choisis qui peut la voir : tes proches réservent un cadeau sans que tu saches lequel.')}</p>
       <button class="btn primary" data-action="login">${GOOGLE_LOGO} Se connecter avec Google</button>
-      <p class="hint">Ta connexion sert à retrouver tes listes. Tes proches, eux, n’ont pas besoin de compte pour réserver.</p>
+      <p class="hint">La connexion avec Google est nécessaire pour tout le monde, propriétaire comme proche.</p>
     </section>`;
 }
 
-async function routeHome(token) {
-  if (!isGoogle(user)) return renderLogin();
-  app.innerHTML = '<p class="lead">Chargement…</p>';
-  let docs = [];
-  try {
-    const s = await getDocs(query(collection(db, 'lists'), where('ownerUid', '==', user.uid)));
-    docs = s.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
-  } catch (e) { return renderError('Impossible de charger tes listes. Vérifie les règles Firestore.'); }
-  if (token !== routeToken) return;
-  const prenom = (user.displayName || '').split(' ')[0];
+/* ----- Profil : choix du nom affiché ----- */
+function routeProfile() {
+  const first = !profile;
+  const suggestion = profile?.name || (user.displayName || '').split(' ')[0] || '';
   app.innerHTML = `
     <section class="card hero">
-      <h1>Créer une liste 🎁</h1>
-      <p class="lead">Donne un titre, un petit mot, et ajoute tes envies à l’étape suivante.</p>
+      <h1>${first ? 'Bienvenue ! 👋' : 'Mon profil'}</h1>
+      <p class="lead">${first
+        ? 'Choisis le nom sous lequel tu apparaîtras dans l’application. Les autres utilisateurs le verront quand ils choisiront qui peut voir leur liste, ou quand tu réserveras un cadeau.'
+        : 'Ce nom est visible par les autres utilisateurs de l’application.'}</p>
+      <form data-form="profile" novalidate>
+        <label for="p-name">Mon nom *</label>
+        <input id="p-name" name="name" required minlength="2" maxlength="40" value="${esc(suggestion)}" autocomplete="nickname">
+        <p class="hint">Ton adresse e-mail Google n’est jamais affichée.</p>
+        <div class="btn-row">
+          <button class="btn primary" type="submit">${first ? 'Continuer' : 'Enregistrer'}</button>
+          ${first ? '' : '<a class="btn" href="#/">Annuler</a>'}
+        </div>
+      </form>
+    </section>`;
+  $('#p-name').focus();
+}
+
+/* ----- Accueil : mes listes + listes partagées avec moi ----- */
+async function routeHome(token) {
+  app.innerHTML = '<p class="lead">Chargement…</p>';
+  let mine = [], shared = [];
+  try {
+    const [a, b] = await Promise.all([
+      getDocs(query(collection(db, 'lists'), where('ownerUid', '==', user.uid))),
+      getDocs(query(collection(db, 'lists'), where('allowedUids', 'array-contains', user.uid)))
+    ]);
+    mine = a.docs.map(d => ({ id: d.id, ...d.data() })).sort((x, y) => (x.createdAt || 0) - (y.createdAt || 0));
+    shared = b.docs.map(d => ({ id: d.id, ...d.data() })).sort((x, y) => (x.createdAt || 0) - (y.createdAt || 0));
+    if (shared.length) await loadUsers();
+  } catch (e) { return renderError('Impossible de charger les listes. Vérifie les règles Firestore.'); }
+  if (token !== routeToken) return;
+  app.innerHTML = `
+    ${shared.length ? `<h2 class="section-title" style="margin-top:0">🎁 Listes partagées avec moi</h2>
+      <ul class="gifts">${shared.map(l => `
+        <li class="gift"><div class="main"><h3>${esc(l.titre)}</h3><p>Liste de ${esc(usersById[l.ownerUid] || 'un proche')}</p></div>
+        <div class="actions"><a class="btn small primary" href="#/l/${esc(l.id)}">Voir la liste</a></div></li>`).join('')}</ul>` : ''}
+
+    <section class="card hero" style="${shared.length ? 'margin-top:26px' : ''}">
+      <h1>Créer ma liste 🎄</h1>
+      <p class="lead">Donne-lui un titre, ajoute tes envies, puis choisis qui peut la voir.</p>
       <form data-form="create-list" novalidate>
         <label for="l-titre">Titre de la liste *</label>
         <input id="l-titre" name="titre" required maxlength="120" placeholder="Ex : Noël 2026">
-        <label for="l-prenom">Ton prénom *</label>
-        <input id="l-prenom" name="prenom" required maxlength="60" value="${esc(prenom)}" autocomplete="given-name">
         <label for="l-msg">Message d’accueil</label>
         <textarea id="l-msg" name="message" maxlength="500" placeholder="Un petit mot pour tes proches…"></textarea>
         <div class="btn-row"><button class="btn primary" type="submit">Créer ma liste</button></div>
       </form>
     </section>
-    ${docs.length ? `<h2 class="section-title">Mes listes</h2><ul class="gifts">${docs.map(l => `
-      <li class="gift"><div class="main"><h3>${esc(l.titre)}</h3><p>${esc(l.prenom)}</p></div>
+
+    ${mine.length ? `<h2 class="section-title">Mes listes</h2><ul class="gifts">${mine.map(l => `
+      <li class="gift"><div class="main"><h3>${esc(l.titre)}</h3>
+        <p>${(l.allowedUids || []).length} personne${(l.allowedUids || []).length > 1 ? 's' : ''} ${(l.allowedUids || []).length ? 'ont' : 'a'} accès</p></div>
       <div class="actions"><a class="btn small primary" href="#/liste/${esc(l.id)}">Ouvrir</a></div></li>`).join('')}</ul>` : ''}`;
 }
 
@@ -274,35 +312,67 @@ function giftFormHtml() {
     </form>`;
 }
 
+function renderPicker() {
+  const box = $('#picker'); if (!box) return;
+  const q = ($('#user-search')?.value || '').trim().toLowerCase();
+  const others = Object.entries(usersById).filter(([uid]) => uid !== user.uid)
+    .sort((a, b) => a[1].localeCompare(b[1], 'fr'));
+  if (!others.length) {
+    box.innerHTML = `<div class="empty">Personne d’autre n’est encore inscrit. Envoie l’adresse de ce site à tes proches : dès qu’ils se seront connectés avec Google, ils apparaîtront ici.</div>`;
+  } else {
+    const shown = others.filter(([, n]) => n.toLowerCase().includes(q));
+    box.innerHTML = shown.length
+      ? `<ul class="people">${shown.map(([uid, n]) => `
+          <li><label class="person"><input type="checkbox" data-uid="${esc(uid)}" ${currentAllowed.has(uid) ? 'checked' : ''}>
+          <span>${esc(n)}</span></label></li>`).join('')}</ul>`
+      : '<p class="hint">Aucun résultat.</p>';
+  }
+  const c = $('#allowed-count'); if (c) c.textContent = currentAllowed.size;
+}
+
 async function routeOwner(id, token) {
-  if (!isGoogle(user)) return renderLogin('Connecte-toi avec Google pour gérer ta liste.');
   let l;
   try {
     const snap = await getDoc(doc(db, 'lists', id));
     if (token !== routeToken) return;
-    if (!snap.exists()) return renderNotFound();
+    if (!snap.exists()) return renderNoAccess();
     l = snap.data();
-  } catch (e) { return renderError('Impossible de charger la liste. Vérifie les règles Firestore.'); }
+  } catch (e) { return renderNoAccess(); }
   if (l.ownerUid !== user.uid) { location.replace('#/l/' + id); return; }
+  try { await loadUsers(); } catch (e) { usersById = {}; }
+  if (token !== routeToken) return;
 
   currentListId = id; editingId = null; currentGifts = [];
+  currentAllowed = new Set(l.allowedUids || []);
   app.innerHTML = `
     <p><a href="#/">← Mes listes</a></p>
     <section class="card">
       <h2>${esc(l.titre)}</h2>
-      <p class="lead">Liste de ${esc(l.prenom)}${l.message ? ' · ' + esc(l.message) : ''}</p>
-      <label for="share-input">Lien à envoyer à tes proches</label>
+      <p class="lead">${l.message ? esc(l.message) : 'Pas de message d’accueil.'}</p>
+      <label for="share-input" style="margin-top:0">Lien de la liste</label>
       <div class="share">
         <input id="share-input" readonly value="${esc(shareUrl(id))}">
         <button class="btn primary" data-action="copy">Copier le lien</button>
       </div>
-      <p class="hint">Tes réservations restent secrètes : tu ne verras jamais qui offre quoi. Le lien reste le même quand tu modifies ta liste.</p>
+      <p class="hint">Seules les personnes cochées ci-dessous peuvent ouvrir ce lien (après connexion avec Google). Tes réservations restent secrètes : tu ne verras jamais qui offre quoi.</p>
       <div class="btn-row"><a class="btn small" href="#/apercu/${esc(id)}">👀 Aperçu côté proche</a></div>
     </section>
+
+    <section class="card">
+      <div class="people-head">
+        <h2>Qui peut voir ma liste ? (<span id="allowed-count">0</span>)</h2>
+        <button class="btn small" data-action="refresh-users" type="button">↻ Actualiser</button>
+      </div>
+      <p class="lead">Coche les personnes à qui tu donnes accès.</p>
+      <input id="user-search" type="search" placeholder="Rechercher un nom…" aria-label="Rechercher une personne">
+      <div id="picker"></div>
+    </section>
+
     <section class="card"><h2 id="form-title">Ajouter un cadeau</h2>${giftFormHtml()}</section>
     <h2 class="section-title">Mes cadeaux (<span id="gift-count">0</span>)</h2>
     <div id="gift-list"></div>
     <div class="btn-row"><button class="btn danger small" data-action="delete-list">Supprimer cette liste</button></div>`;
+  renderPicker();
 
   unsubs.push(onSnapshot(query(collection(db, 'lists', id, 'gifts'), orderBy('createdAt')), (s) => {
     currentGifts = s.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -331,34 +401,30 @@ function giftItemOwner(g) {
 
 /* ----- Vue "proche" ----- */
 async function routeGuest(id, token, preview) {
-  if (!user) {                       // visiteur sans compte : connexion anonyme invisible
-    try { await signInAnonymously(auth); } catch (e) { renderError('Connexion impossible. L’authentification anonyme est-elle activée ?'); }
-    return;                          // l'état d'authentification relance la route
-  }
-  let l;
+  let l, ownerName = 'un proche';
   try {
     const snap = await getDoc(doc(db, 'lists', id));
     if (token !== routeToken) return;
-    if (!snap.exists()) return renderNotFound();
+    if (!snap.exists()) return renderNoAccess();
     l = snap.data();
-  } catch (e) { return renderError('Impossible de charger la liste.'); }
+    const o = await getDoc(doc(db, 'users', l.ownerUid));
+    if (o.exists()) ownerName = String(o.data().name || ownerName);
+  } catch (e) { return renderNoAccess(); }
+  if (token !== routeToken) return;
 
-  const owner = isGoogle(user) && l.ownerUid === user.uid;
+  const owner = l.ownerUid === user.uid;
   if (owner && !preview) { location.replace('#/liste/' + id); return; }   // le propriétaire garde la surprise
   if (preview && !owner) { location.replace('#/l/' + id); return; }
 
   currentListId = id; guestPreview = preview; currentGifts = []; currentRes = {};
   app.innerHTML = `
-    ${preview ? `<div class="banner">👀 Aperçu : voici ce que verront tes proches. <a href="#/liste/${esc(id)}">← Retour à ma liste</a></div>` : ''}
+    ${preview ? `<div class="banner">👀 Aperçu : voici ce que verront les personnes autorisées. <a href="#/liste/${esc(id)}">← Retour à ma liste</a></div>`
+              : '<p><a href="#/">← Accueil</a></p>'}
     <section class="card hero">
       <h1>${esc(l.titre || 'Liste de Noël')}</h1>
-      <p class="lead">Liste de ${esc(l.prenom)}</p>
+      <p class="lead">Liste de ${esc(ownerName)}</p>
       ${l.message ? `<p>${esc(l.message)}</p>` : ''}
-    </section>
-    <section class="card">
-      <label for="guest-name" style="margin-top:0">Ton prénom (pour réserver un cadeau)</label>
-      <input id="guest-name" maxlength="60" autocomplete="given-name" value="${esc(getName())}" placeholder="Ex : Julie">
-      <p class="hint">${esc(l.prenom)} ne verra pas qui a réservé quoi. Les cadeaux réservés sont grisés pour éviter les doublons.</p>
+      <p class="hint">${esc(ownerName)} ne verra pas qui a réservé quoi. Les cadeaux réservés sont grisés pour éviter les doublons.</p>
     </section>
     <div id="gift-list"></div>`;
 
@@ -379,11 +445,11 @@ function renderGuestGifts() {
   if (!currentGifts.length) { box.innerHTML = '<div class="empty">Cette liste est vide pour le moment.</div>'; return; }
   box.innerHTML = `<ul class="gifts">${currentGifts.map(g => {
     const r = currentRes[g.id];
-    const mine = r && user && r.byUid === user.uid;
+    const mine = r && r.byUid === user.uid;
     return `<li class="gift ${r ? 'reserved' : ''}"><div class="main">
         <h3>${esc(g.nom)}<span class="badge p${g.prio}">${PRIO[g.prio] || PRIO[1]}</span></h3>
         ${g.desc ? `<p>${esc(g.desc)}</p>` : ''}${giftMeta(g)}
-        ${r ? `<div class="meta"><span class="tag-reserved">🎁 Réservé par ${esc(r.name)}</span></div>` : ''}</div>
+        ${r ? `<div class="meta"><span class="tag-reserved">🎁 Réservé par ${esc(mine ? 'toi' : r.name)}</span></div>` : ''}</div>
       <div class="actions">
         ${!r ? `<button class="btn small primary" data-action="reserve" data-id="${esc(g.id)}" ${guestPreview ? 'disabled title="Désactivé dans l’aperçu"' : ''}>Je l’offre</button>` : ''}
         ${mine ? `<button class="btn small" data-action="unreserve" data-id="${esc(g.id)}">Annuler</button>` : ''}
@@ -398,7 +464,10 @@ function route() {
   clearSubs();
   const token = ++routeToken;
   if (!configured) return renderSetup();
+  if (!user) return renderLogin();
+  if (profileFailed) return renderError('Impossible de charger ton profil. Vérifie les règles Firestore.');
   const h = location.hash || '';
+  if (!profile || h === '#/profil') return routeProfile();     // 1re connexion : choix du nom
   let m;
   if ((m = h.match(/^#\/liste\/([\w-]+)$/))) return routeOwner(m[1], token);
   if ((m = h.match(/^#\/apercu\/([\w-]+)$/))) return routeGuest(m[1], token, true);
@@ -406,8 +475,20 @@ function route() {
   return routeHome(token);
 }
 window.addEventListener('hashchange', () => { route(); window.scrollTo(0, 0); });
+
 if (configured) {
-  onAuthStateChanged(auth, (u) => { user = u; renderAuthBar(); route(); });
+  onAuthStateChanged(auth, async (u) => {
+    if (u && u.isAnonymous) { await signOut(auth); return; }   // anciennes sessions anonymes : refusées
+    user = u; profile = null; profileFailed = false;
+    if (u) {
+      try {
+        const s = await getDoc(doc(db, 'users', u.uid));
+        profile = s.exists() ? { name: String(s.data().name || '') } : null;
+        if (profile && !profile.name) profile = null;
+      } catch (e) { profileFailed = true; }
+    }
+    renderAuthBar(); route();
+  });
 } else { route(); }
 
 /* =====================================================
@@ -425,11 +506,20 @@ app.addEventListener('submit', async (e) => {
   e.preventDefault();
   const f = e.target, kind = f.dataset.form, data = Object.fromEntries(new FormData(f));
   try {
+    if (kind === 'profile') {
+      const name = (data.name || '').trim().replace(/\s+/g, ' ');
+      if (name.length < 2) { toast('Choisis un nom d’au moins 2 caractères'); f.name.focus(); return; }
+      const wasFirst = !profile;
+      await setDoc(doc(db, 'users', user.uid), { name, updatedAt: Date.now() }, { merge: true });
+      profile = { name }; renderAuthBar();
+      toast('Nom enregistré ✔');
+      if (wasFirst && (location.hash || '#/') !== '#/profil') route(); else location.hash = '#/';
+    }
     if (kind === 'create-list') {
-      const titre = (data.titre || '').trim(), prenom = (data.prenom || '').trim();
-      if (!titre || !prenom) { toast('Titre et prénom sont obligatoires'); return; }
+      const titre = (data.titre || '').trim();
+      if (!titre) { toast('Le titre est obligatoire'); f.titre.focus(); return; }
       const ref = await addDoc(collection(db, 'lists'), {
-        ownerUid: user.uid, titre, prenom, message: (data.message || '').trim(), createdAt: Date.now()
+        ownerUid: user.uid, titre, message: (data.message || '').trim(), allowedUids: [], createdAt: Date.now()
       });
       location.hash = '#/liste/' + ref.id;
     }
@@ -455,14 +545,27 @@ app.addEventListener('submit', async (e) => {
   } catch (err) { toast('Enregistrement impossible (règles Firestore ?)'); }
 });
 
-app.addEventListener('input', (e) => { if (e.target.id === 'guest-name') setName(e.target.value); });
+document.addEventListener('input', (e) => { if (e.target.id === 'user-search') renderPicker(); });
 
-app.addEventListener('click', async (e) => {
+/* Cocher / décocher une personne : l'accès est mis à jour immédiatement */
+document.addEventListener('change', async (e) => {
+  const c = e.target.closest('input[data-uid]'); if (!c) return;
+  const uid = c.dataset.uid, want = c.checked;
+  try {
+    await updateDoc(doc(db, 'lists', currentListId), { allowedUids: want ? arrayUnion(uid) : arrayRemove(uid) });
+    want ? currentAllowed.add(uid) : currentAllowed.delete(uid);
+    $('#allowed-count').textContent = currentAllowed.size;
+  } catch (err) { c.checked = !want; toast('Modification impossible pour le moment'); }
+});
+
+document.addEventListener('click', async (e) => {
   const b = e.target.closest('[data-action]'); if (!b) return;
   const act = b.dataset.action, gid = b.dataset.id;
   try {
     if (act === 'login') await signInWithPopup(auth, new GoogleAuthProvider());
+    if (act === 'logout') { await signOut(auth); location.hash = '#/'; }
     if (act === 'copy') toast(await copyText(shareUrl(currentListId)) ? 'Lien copié 📋' : 'Sélectionne le lien et copie-le');
+    if (act === 'refresh-users') { await loadUsers(); renderPicker(); toast('Liste des personnes actualisée'); }
     if (act === 'edit') {
       const g = currentGifts.find(x => x.id === gid); if (!g) return;
       const f = document.querySelector('form[data-form="gift"]');
@@ -486,19 +589,15 @@ app.addEventListener('click', async (e) => {
       location.hash = '#/';
     }
     if (act === 'reserve') {
-      const input = $('#guest-name'), name = (input.value || '').trim();
-      if (!name) { toast('Indique ton prénom pour réserver'); input.focus(); return; }
-      setName(name);
       try {
-        await setDoc(doc(db, 'lists', currentListId, 'reservations', gid), { name, byUid: user.uid });
-        toast('Merci ' + name + ' ! Cadeau réservé 🎁');
+        await setDoc(doc(db, 'lists', currentListId, 'reservations', gid), { name: profile.name, byUid: user.uid });
+        toast('Merci ' + profile.name + ' ! Cadeau réservé 🎁');
       } catch (err) { toast('Ce cadeau vient d’être réservé par quelqu’un d’autre'); }
     }
     if (act === 'unreserve') {
       await deleteDoc(doc(db, 'lists', currentListId, 'reservations', gid));
       toast('Réservation annulée');
     }
-    if (act === 'logout') { await signOut(auth); location.hash = '#/'; }
   } catch (err) {
     if (act === 'login') toast('Connexion annulée ou impossible');
     else toast('Action impossible pour le moment');
