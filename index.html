@@ -11,18 +11,23 @@
     --bg: #fbf7f2; --card: #ffffff; --ink: #2a2320; --muted: #6b5f58; --line: #e8dfd5;
     --red: #b3262d; --red-ink: #ffffff; --green: #1f5a3d; --gold: #b98410; --gold-soft: #f6e9c8;
     --shadow: 0 2px 10px rgba(60, 30, 20, .08); --radius: 14px;
+    --page-bg: #d3e3d8;   /* fond de page : vert tendre, pour que les contours blancs se voient */
+    --pattern: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%27240%27%20height%3D%27240%27%20viewBox%3D%270%200%20240%20240%27%20fill%3D%27none%27%20stroke%3D%27white%27%20stroke-opacity%3D%270.9%27%20stroke-width%3D%271.8%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cg%20transform%3D%27translate%2855%2060%29%20scale%281%29%27%3E%3Cpath%20d%3D%27M0%20-22%20L10%20-8%20H5%20L13%206%20H6%20L16%2020%20H-16%20L-6%206%20H-13%20L-5%20-8%20H-10%20Z%20M-3%2020%20V27%20H3%20V20%27%20vector-effect%3D%27non-scaling-stroke%27%20%2F%3E%3C%2Fg%3E%3Cg%20transform%3D%27translate%28175%20175%29%20scale%280.85%29%27%3E%3Cpath%20d%3D%27M0%20-22%20L10%20-8%20H5%20L13%206%20H6%20L16%2020%20H-16%20L-6%206%20H-13%20L-5%20-8%20H-10%20Z%20M-3%2020%20V27%20H3%20V20%27%20vector-effect%3D%27non-scaling-stroke%27%20%2F%3E%3C%2Fg%3E%3Cg%20transform%3D%27translate%28190%2045%29%20scale%280.5%29%27%3E%3Cpath%20d%3D%27M0%20-22%20L10%20-8%20H5%20L13%206%20H6%20L16%2020%20H-16%20L-6%206%20H-13%20L-5%20-8%20H-10%20Z%20M-3%2020%20V27%20H3%20V20%27%20vector-effect%3D%27non-scaling-stroke%27%20%2F%3E%3C%2Fg%3E%3Cg%20transform%3D%27translate%28120%20105%29%20rotate%280%29%20scale%281.1%29%27%3E%3Cg%20transform%3D%27rotate%280%29%27%3E%3Cpath%20d%3D%27M0%20-10%20V10%20M0%20-6%20L-3%20-9%20M0%20-6%20L3%20-9%20M0%206%20L-3%209%20M0%206%20L3%209%27%20vector-effect%3D%27non-scaling-stroke%27%20%2F%3E%3C%2Fg%3E%3Cg%20transform%3D%27rotate%2860%29%27%3E%3Cpath%20d%3D%27M0%20-10%20V10%20M0%20-6%20L-3%20-9%20M0%20-6%20L3%20-9%20M0%206%20L-3%209%20M0%206%20L3%209%27%20vector-effect%3D%27non-scaling-stroke%27%20%2F%3E%3C%2Fg%3E%3Cg%20transform%3D%27rotate%28120%29%27%3E%3Cpath%20d%3D%27M0%20-10%20V10%20M0%20-6%20L-3%20-9%20M0%20-6%20L3%20-9%20M0%206%20L-3%209%20M0%206%20L3%209%27%20vector-effect%3D%27non-scaling-stroke%27%20%2F%3E%3C%2Fg%3E%3C%2Fg%3E%3Cg%20transform%3D%27translate%2835%20165%29%20rotate%2815%29%20scale%280.8%29%27%3E%3Cg%20transform%3D%27rotate%280%29%27%3E%3Cpath%20d%3D%27M0%20-10%20V10%20M0%20-6%20L-3%20-9%20M0%20-6%20L3%20-9%20M0%206%20L-3%209%20M0%206%20L3%209%27%20vector-effect%3D%27non-scaling-stroke%27%20%2F%3E%3C%2Fg%3E%3Cg%20transform%3D%27rotate%2860%29%27%3E%3Cpath%20d%3D%27M0%20-10%20V10%20M0%20-6%20L-3%20-9%20M0%20-6%20L3%20-9%20M0%206%20L-3%209%20M0%206%20L3%209%27%20vector-effect%3D%27non-scaling-stroke%27%20%2F%3E%3C%2Fg%3E%3Cg%20transform%3D%27rotate%28120%29%27%3E%3Cpath%20d%3D%27M0%20-10%20V10%20M0%20-6%20L-3%20-9%20M0%20-6%20L3%20-9%20M0%206%20L-3%209%20M0%206%20L3%209%27%20vector-effect%3D%27non-scaling-stroke%27%20%2F%3E%3C%2Fg%3E%3C%2Fg%3E%3Cg%20transform%3D%27translate%28120%20215%29%20rotate%2830%29%20scale%280.7%29%27%3E%3Cg%20transform%3D%27rotate%280%29%27%3E%3Cpath%20d%3D%27M0%20-10%20V10%20M0%20-6%20L-3%20-9%20M0%20-6%20L3%20-9%20M0%206%20L-3%209%20M0%206%20L3%209%27%20vector-effect%3D%27non-scaling-stroke%27%20%2F%3E%3C%2Fg%3E%3Cg%20transform%3D%27rotate%2860%29%27%3E%3Cpath%20d%3D%27M0%20-10%20V10%20M0%20-6%20L-3%20-9%20M0%20-6%20L3%20-9%20M0%206%20L-3%209%20M0%206%20L3%209%27%20vector-effect%3D%27non-scaling-stroke%27%20%2F%3E%3C%2Fg%3E%3Cg%20transform%3D%27rotate%28120%29%27%3E%3Cpath%20d%3D%27M0%20-10%20V10%20M0%20-6%20L-3%20-9%20M0%20-6%20L3%20-9%20M0%206%20L-3%209%20M0%206%20L3%209%27%20vector-effect%3D%27non-scaling-stroke%27%20%2F%3E%3C%2Fg%3E%3C%2Fg%3E%3Cg%20transform%3D%27translate%28225%20115%29%20rotate%2810%29%20scale%280.7%29%27%3E%3Cg%20transform%3D%27rotate%280%29%27%3E%3Cpath%20d%3D%27M0%20-10%20V10%20M0%20-6%20L-3%20-9%20M0%20-6%20L3%20-9%20M0%206%20L-3%209%20M0%206%20L3%209%27%20vector-effect%3D%27non-scaling-stroke%27%20%2F%3E%3C%2Fg%3E%3Cg%20transform%3D%27rotate%2860%29%27%3E%3Cpath%20d%3D%27M0%20-10%20V10%20M0%20-6%20L-3%20-9%20M0%20-6%20L3%20-9%20M0%206%20L-3%209%20M0%206%20L3%209%27%20vector-effect%3D%27non-scaling-stroke%27%20%2F%3E%3C%2Fg%3E%3Cg%20transform%3D%27rotate%28120%29%27%3E%3Cpath%20d%3D%27M0%20-10%20V10%20M0%20-6%20L-3%20-9%20M0%20-6%20L3%20-9%20M0%206%20L-3%209%20M0%206%20L3%209%27%20vector-effect%3D%27non-scaling-stroke%27%20%2F%3E%3C%2Fg%3E%3C%2Fg%3E%3Cg%20transform%3D%27translate%2895%2020%29%20rotate%280%29%20scale%280.6%29%27%3E%3Cg%20transform%3D%27rotate%280%29%27%3E%3Cpath%20d%3D%27M0%20-10%20V10%20M0%20-6%20L-3%20-9%20M0%20-6%20L3%20-9%20M0%206%20L-3%209%20M0%206%20L3%209%27%20vector-effect%3D%27non-scaling-stroke%27%20%2F%3E%3C%2Fg%3E%3Cg%20transform%3D%27rotate%2860%29%27%3E%3Cpath%20d%3D%27M0%20-10%20V10%20M0%20-6%20L-3%20-9%20M0%20-6%20L3%20-9%20M0%206%20L-3%209%20M0%206%20L3%209%27%20vector-effect%3D%27non-scaling-stroke%27%20%2F%3E%3C%2Fg%3E%3Cg%20transform%3D%27rotate%28120%29%27%3E%3Cpath%20d%3D%27M0%20-10%20V10%20M0%20-6%20L-3%20-9%20M0%20-6%20L3%20-9%20M0%206%20L-3%209%20M0%206%20L3%209%27%20vector-effect%3D%27non-scaling-stroke%27%20%2F%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E");
   }
   @media (prefers-color-scheme: dark) {
     :root {
       --bg: #17120f; --card: #231c18; --ink: #f4ece4; --muted: #b9aca2; --line: #3a2f29;
       --red: #e0525a; --red-ink: #1a0d0e; --green: #6fc79b; --gold: #e3b750; --gold-soft: #3a2f14;
       --shadow: 0 2px 10px rgba(0, 0, 0, .4);
+      --page-bg: #17120f;
+      --pattern: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%27240%27%20height%3D%27240%27%20viewBox%3D%270%200%20240%20240%27%20fill%3D%27none%27%20stroke%3D%27white%27%20stroke-opacity%3D%270.13%27%20stroke-width%3D%271.8%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%3E%3Cg%20transform%3D%27translate%2855%2060%29%20scale%281%29%27%3E%3Cpath%20d%3D%27M0%20-22%20L10%20-8%20H5%20L13%206%20H6%20L16%2020%20H-16%20L-6%206%20H-13%20L-5%20-8%20H-10%20Z%20M-3%2020%20V27%20H3%20V20%27%20vector-effect%3D%27non-scaling-stroke%27%20%2F%3E%3C%2Fg%3E%3Cg%20transform%3D%27translate%28175%20175%29%20scale%280.85%29%27%3E%3Cpath%20d%3D%27M0%20-22%20L10%20-8%20H5%20L13%206%20H6%20L16%2020%20H-16%20L-6%206%20H-13%20L-5%20-8%20H-10%20Z%20M-3%2020%20V27%20H3%20V20%27%20vector-effect%3D%27non-scaling-stroke%27%20%2F%3E%3C%2Fg%3E%3Cg%20transform%3D%27translate%28190%2045%29%20scale%280.5%29%27%3E%3Cpath%20d%3D%27M0%20-22%20L10%20-8%20H5%20L13%206%20H6%20L16%2020%20H-16%20L-6%206%20H-13%20L-5%20-8%20H-10%20Z%20M-3%2020%20V27%20H3%20V20%27%20vector-effect%3D%27non-scaling-stroke%27%20%2F%3E%3C%2Fg%3E%3Cg%20transform%3D%27translate%28120%20105%29%20rotate%280%29%20scale%281.1%29%27%3E%3Cg%20transform%3D%27rotate%280%29%27%3E%3Cpath%20d%3D%27M0%20-10%20V10%20M0%20-6%20L-3%20-9%20M0%20-6%20L3%20-9%20M0%206%20L-3%209%20M0%206%20L3%209%27%20vector-effect%3D%27non-scaling-stroke%27%20%2F%3E%3C%2Fg%3E%3Cg%20transform%3D%27rotate%2860%29%27%3E%3Cpath%20d%3D%27M0%20-10%20V10%20M0%20-6%20L-3%20-9%20M0%20-6%20L3%20-9%20M0%206%20L-3%209%20M0%206%20L3%209%27%20vector-effect%3D%27non-scaling-stroke%27%20%2F%3E%3C%2Fg%3E%3Cg%20transform%3D%27rotate%28120%29%27%3E%3Cpath%20d%3D%27M0%20-10%20V10%20M0%20-6%20L-3%20-9%20M0%20-6%20L3%20-9%20M0%206%20L-3%209%20M0%206%20L3%209%27%20vector-effect%3D%27non-scaling-stroke%27%20%2F%3E%3C%2Fg%3E%3C%2Fg%3E%3Cg%20transform%3D%27translate%2835%20165%29%20rotate%2815%29%20scale%280.8%29%27%3E%3Cg%20transform%3D%27rotate%280%29%27%3E%3Cpath%20d%3D%27M0%20-10%20V10%20M0%20-6%20L-3%20-9%20M0%20-6%20L3%20-9%20M0%206%20L-3%209%20M0%206%20L3%209%27%20vector-effect%3D%27non-scaling-stroke%27%20%2F%3E%3C%2Fg%3E%3Cg%20transform%3D%27rotate%2860%29%27%3E%3Cpath%20d%3D%27M0%20-10%20V10%20M0%20-6%20L-3%20-9%20M0%20-6%20L3%20-9%20M0%206%20L-3%209%20M0%206%20L3%209%27%20vector-effect%3D%27non-scaling-stroke%27%20%2F%3E%3C%2Fg%3E%3Cg%20transform%3D%27rotate%28120%29%27%3E%3Cpath%20d%3D%27M0%20-10%20V10%20M0%20-6%20L-3%20-9%20M0%20-6%20L3%20-9%20M0%206%20L-3%209%20M0%206%20L3%209%27%20vector-effect%3D%27non-scaling-stroke%27%20%2F%3E%3C%2Fg%3E%3C%2Fg%3E%3Cg%20transform%3D%27translate%28120%20215%29%20rotate%2830%29%20scale%280.7%29%27%3E%3Cg%20transform%3D%27rotate%280%29%27%3E%3Cpath%20d%3D%27M0%20-10%20V10%20M0%20-6%20L-3%20-9%20M0%20-6%20L3%20-9%20M0%206%20L-3%209%20M0%206%20L3%209%27%20vector-effect%3D%27non-scaling-stroke%27%20%2F%3E%3C%2Fg%3E%3Cg%20transform%3D%27rotate%2860%29%27%3E%3Cpath%20d%3D%27M0%20-10%20V10%20M0%20-6%20L-3%20-9%20M0%20-6%20L3%20-9%20M0%206%20L-3%209%20M0%206%20L3%209%27%20vector-effect%3D%27non-scaling-stroke%27%20%2F%3E%3C%2Fg%3E%3Cg%20transform%3D%27rotate%28120%29%27%3E%3Cpath%20d%3D%27M0%20-10%20V10%20M0%20-6%20L-3%20-9%20M0%20-6%20L3%20-9%20M0%206%20L-3%209%20M0%206%20L3%209%27%20vector-effect%3D%27non-scaling-stroke%27%20%2F%3E%3C%2Fg%3E%3C%2Fg%3E%3Cg%20transform%3D%27translate%28225%20115%29%20rotate%2810%29%20scale%280.7%29%27%3E%3Cg%20transform%3D%27rotate%280%29%27%3E%3Cpath%20d%3D%27M0%20-10%20V10%20M0%20-6%20L-3%20-9%20M0%20-6%20L3%20-9%20M0%206%20L-3%209%20M0%206%20L3%209%27%20vector-effect%3D%27non-scaling-stroke%27%20%2F%3E%3C%2Fg%3E%3Cg%20transform%3D%27rotate%2860%29%27%3E%3Cpath%20d%3D%27M0%20-10%20V10%20M0%20-6%20L-3%20-9%20M0%20-6%20L3%20-9%20M0%206%20L-3%209%20M0%206%20L3%209%27%20vector-effect%3D%27non-scaling-stroke%27%20%2F%3E%3C%2Fg%3E%3Cg%20transform%3D%27rotate%28120%29%27%3E%3Cpath%20d%3D%27M0%20-10%20V10%20M0%20-6%20L-3%20-9%20M0%20-6%20L3%20-9%20M0%206%20L-3%209%20M0%206%20L3%209%27%20vector-effect%3D%27non-scaling-stroke%27%20%2F%3E%3C%2Fg%3E%3C%2Fg%3E%3Cg%20transform%3D%27translate%2895%2020%29%20rotate%280%29%20scale%280.6%29%27%3E%3Cg%20transform%3D%27rotate%280%29%27%3E%3Cpath%20d%3D%27M0%20-10%20V10%20M0%20-6%20L-3%20-9%20M0%20-6%20L3%20-9%20M0%206%20L-3%209%20M0%206%20L3%209%27%20vector-effect%3D%27non-scaling-stroke%27%20%2F%3E%3C%2Fg%3E%3Cg%20transform%3D%27rotate%2860%29%27%3E%3Cpath%20d%3D%27M0%20-10%20V10%20M0%20-6%20L-3%20-9%20M0%20-6%20L3%20-9%20M0%206%20L-3%209%20M0%206%20L3%209%27%20vector-effect%3D%27non-scaling-stroke%27%20%2F%3E%3C%2Fg%3E%3Cg%20transform%3D%27rotate%28120%29%27%3E%3Cpath%20d%3D%27M0%20-10%20V10%20M0%20-6%20L-3%20-9%20M0%20-6%20L3%20-9%20M0%206%20L-3%209%20M0%206%20L3%209%27%20vector-effect%3D%27non-scaling-stroke%27%20%2F%3E%3C%2Fg%3E%3C%2Fg%3E%3C%2Fsvg%3E");
     }
   }
   * { box-sizing: border-box; }
   html { -webkit-text-size-adjust: 100%; }
   body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-         background: var(--bg); color: var(--ink); line-height: 1.5; }
+         background-color: var(--page-bg); background-image: var(--pattern); background-size: 240px 240px;
+         color: var(--ink); line-height: 1.5; }
   a { color: var(--green); }
   h1, h2, h3 { line-height: 1.2; margin: 0; }
   code { background: var(--gold-soft); padding: 1px 6px; border-radius: 6px; font-size: .9em; }
@@ -73,6 +78,7 @@
   .btn.small { padding: 6px 12px; font-size: .9rem; }
   .btn.danger { color: var(--red); }
   .btn[disabled] { opacity: .5; cursor: not-allowed; }
+  [hidden] { display: none !important; }
   .btn-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
 
   .share { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -80,9 +86,12 @@
   .hint { color: var(--muted); font-size: .88rem; margin: 8px 0 0; }
 
   /* Choix des personnes qui ont accès */
-  ul.people { list-style: none; padding: 0; margin: 10px 0 0; display: grid; gap: 4px;
+  ul.people { list-style: none; padding: 0; margin: 10px 0 0; display: grid; gap: 0;
               max-height: 280px; overflow-y: auto; border: 1px solid var(--line); border-radius: 10px; }
   ul.people li { margin: 0; }
+  ul.people li + li { border-top: 1px solid var(--line); }
+  li.person-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 8px 12px; }
+  li.person-row span { overflow-wrap: anywhere; }
   label.person { display: flex; gap: 12px; align-items: center; margin: 0; padding: 10px 12px;
                  font-weight: 500; font-size: 1rem; cursor: pointer; }
   label.person:hover { background: var(--gold-soft); }
@@ -203,6 +212,8 @@ let unsubs = [];                 // abonnements temps réel à fermer à chaque 
 let routeToken = 0;              // évite d'afficher une page périmée
 let currentListId = null;
 let currentAllowed = new Set();
+let currentList = {};            // titre + description de la liste ouverte (vue propriétaire)
+let pendingAdd = new Set();      // personnes cochées dans la fenêtre « Ajouter des personnes »
 let currentGifts = [];
 let currentRes = {};
 let editingId = null;
@@ -353,22 +364,44 @@ function giftFormHtml() {
     </form>`;
 }
 
+/* Personnes qui ont déjà accès à la liste (avec un bouton pour retirer l'accès) */
+function renderAccess() {
+  const box = $('#access-list'); if (!box) return;
+  const people = [...currentAllowed].map(uid => [uid, usersById[uid] || 'Utilisateur inconnu'])
+    .sort((a, b) => a[1].localeCompare(b[1], 'fr'));
+  box.innerHTML = people.length
+    ? `<ul class="people">${people.map(([uid, n]) => `
+        <li class="person-row"><span>${esc(n)}</span>
+        <button class="btn small danger" type="button" data-action="remove-person" data-uid="${esc(uid)}" aria-label="Retirer ${esc(n)}">Retirer</button></li>`).join('')}</ul>`
+    : '<div class="empty">Personne n’a encore accès à ta liste. Clique sur + pour ajouter des personnes.</div>';
+  const c = $('#allowed-count'); if (c) c.textContent = currentAllowed.size;
+}
+
+/* Fenêtre « Ajouter des personnes » : uniquement celles qui n'ont pas encore accès */
+function updateAddButton() {
+  const b = $('#add-confirm'); if (!b) return;
+  b.textContent = pendingAdd.size ? `Ajouter (${pendingAdd.size})` : 'Ajouter';
+  b.disabled = pendingAdd.size === 0;
+}
 function renderPicker() {
   const box = $('#picker'); if (!box) return;
   const q = ($('#user-search')?.value || '').trim().toLowerCase();
-  const others = Object.entries(usersById).filter(([uid]) => uid !== user.uid)
+  const others = Object.entries(usersById).filter(([uid]) => uid !== user.uid);
+  const candidates = others.filter(([uid]) => !currentAllowed.has(uid))
     .sort((a, b) => a[1].localeCompare(b[1], 'fr'));
-  if (!others.length) {
-    box.innerHTML = `<div class="empty">Personne d’autre n’est encore inscrit. Envoie l’adresse de ce site à tes proches : dès qu’ils se seront connectés avec Google, ils apparaîtront ici.</div>`;
+  if (!candidates.length) {
+    box.innerHTML = others.length
+      ? '<div class="empty">Toutes les personnes inscrites ont déjà accès à ta liste.</div>'
+      : '<div class="empty">Personne d’autre n’est encore inscrit. Envoie l’adresse de ce site à tes proches : dès qu’ils se seront connectés avec Google, ils apparaîtront ici.</div>';
   } else {
-    const shown = others.filter(([, n]) => n.toLowerCase().includes(q));
+    const shown = candidates.filter(([, n]) => n.toLowerCase().includes(q));
     box.innerHTML = shown.length
       ? `<ul class="people">${shown.map(([uid, n]) => `
-          <li><label class="person"><input type="checkbox" data-uid="${esc(uid)}" ${currentAllowed.has(uid) ? 'checked' : ''}>
+          <li><label class="person"><input type="checkbox" data-uid="${esc(uid)}" ${pendingAdd.has(uid) ? 'checked' : ''}>
           <span>${esc(n)}</span></label></li>`).join('')}</ul>`
       : '<p class="hint">Aucun résultat.</p>';
   }
-  const c = $('#allowed-count'); if (c) c.textContent = currentAllowed.size;
+  updateAddButton();
 }
 
 async function routeOwner(id, token) {
@@ -385,35 +418,65 @@ async function routeOwner(id, token) {
 
   currentListId = id; editingId = null; currentGifts = [];
   currentAllowed = new Set(l.allowedUids || []);
+  currentList = { titre: l.titre || '', message: l.message || '' };
+  pendingAdd = new Set();
   app.innerHTML = `
     <p><a href="#/">← Mes listes</a></p>
     <section class="card">
-      <h2>${esc(l.titre)}</h2>
-      <p class="lead">${l.message ? esc(l.message) : 'Pas de message d’accueil.'}</p>
+      <div class="people-head">
+        <h2 id="list-title">${esc(l.titre)}</h2>
+        <button class="btn small" type="button" data-action="open-edit-list">✏️ Modifier</button>
+      </div>
+      <p class="lead" id="list-message" style="margin-top:6px">${l.message ? esc(l.message) : 'Pas de description.'}</p>
       <label for="share-input" style="margin-top:0">Lien de la liste</label>
       <div class="share">
         <input id="share-input" readonly value="${esc(shareUrl(id))}">
         <button class="btn primary" data-action="copy">Copier le lien</button>
       </div>
-      <p class="hint">Seules les personnes cochées ci-dessous peuvent ouvrir ce lien (après connexion avec Google). Tes réservations restent secrètes : tu ne verras jamais qui offre quoi.</p>
+      <p class="hint">Seules les personnes listées ci-dessous peuvent ouvrir ce lien (après connexion avec Google). Tes réservations restent secrètes : tu ne verras jamais qui offre quoi.</p>
       <div class="btn-row"><a class="btn small" href="#/apercu/${esc(id)}">👀 Aperçu côté proche</a></div>
     </section>
 
     <section class="card">
       <div class="people-head">
         <h2>Qui peut voir ma liste ? (<span id="allowed-count">0</span>)</h2>
-        <button class="btn small" data-action="refresh-users" type="button">↻ Actualiser</button>
+        <button class="btn primary icon" type="button" data-action="open-add-people" aria-label="Ajouter des personnes" title="Ajouter des personnes">+</button>
       </div>
-      <p class="lead">Coche les personnes à qui tu donnes accès.</p>
-      <input id="user-search" type="search" placeholder="Rechercher un nom…" aria-label="Rechercher une personne">
-      <div id="picker"></div>
+      <div id="access-list" style="margin-top:12px"></div>
     </section>
 
     <section class="card"><h2 id="form-title">Ajouter un cadeau</h2>${giftFormHtml()}</section>
     <h2 class="section-title">Mes cadeaux (<span id="gift-count">0</span>)</h2>
     <div id="gift-list"></div>
-    <div class="btn-row"><button class="btn danger small" data-action="delete-list">Supprimer cette liste</button></div>`;
-  renderPicker();
+    <div class="btn-row"><button class="btn danger small" data-action="delete-list">Supprimer cette liste</button></div>
+
+    <dialog id="edit-list-dialog" aria-labelledby="edit-list-title">
+      <h2 id="edit-list-title">Modifier la liste</h2>
+      <form data-form="edit-list" novalidate>
+        <label for="el-titre">Nom de la liste *</label>
+        <input id="el-titre" name="titre" required maxlength="120">
+        <label for="el-msg">Description</label>
+        <textarea id="el-msg" name="message" maxlength="500" placeholder="Un petit mot pour tes proches…"></textarea>
+        <div class="btn-row">
+          <button class="btn primary" type="submit">Enregistrer</button>
+          <button class="btn" type="button" data-action="close-dialog">Annuler</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="add-people-dialog" aria-labelledby="add-people-title">
+      <h2 id="add-people-title">Ajouter des personnes</h2>
+      <p class="lead">Coche les personnes à qui tu donnes accès à ta liste.</p>
+      <form data-form="add-people" novalidate>
+        <input id="user-search" type="search" placeholder="Rechercher un nom…" aria-label="Rechercher une personne">
+        <div id="picker"></div>
+        <div class="btn-row">
+          <button class="btn primary" type="submit" id="add-confirm" disabled>Ajouter</button>
+          <button class="btn" type="button" data-action="close-dialog">Annuler</button>
+        </div>
+      </form>
+    </dialog>`;
+  renderAccess();
 
   unsubs.push(onSnapshot(query(collection(db, 'lists', id, 'gifts'), orderBy('createdAt')), (s) => {
     currentGifts = s.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -564,6 +627,26 @@ app.addEventListener('submit', async (e) => {
       });
       location.hash = '#/liste/' + ref.id;
     }
+    if (kind === 'edit-list') {
+      const titre = (data.titre || '').trim(), message = (data.message || '').trim();
+      if (!titre) { toast('Le nom de la liste est obligatoire'); f.titre.focus(); return; }
+      await updateDoc(doc(db, 'lists', currentListId), { titre, message });
+      currentList = { titre, message };
+      $('#list-title').textContent = titre;
+      $('#list-message').textContent = message || 'Pas de description.';
+      f.closest('dialog').close();
+      toast('Liste modifiée ✔');
+    }
+    if (kind === 'add-people') {
+      const ids = [...pendingAdd];
+      if (!ids.length) { toast('Coche au moins une personne'); return; }
+      await updateDoc(doc(db, 'lists', currentListId), { allowedUids: arrayUnion(...ids) });
+      ids.forEach(uid => currentAllowed.add(uid));
+      pendingAdd = new Set();
+      renderAccess();
+      f.closest('dialog').close();
+      toast(ids.length > 1 ? ids.length + ' personnes ajoutées ✔' : 'Personne ajoutée ✔');
+    }
     if (kind === 'gift') {
       const nom = (data.nom || '').trim();
       if (!nom) { toast('Donne un nom à ton cadeau'); f.nom.focus(); return; }
@@ -592,19 +675,20 @@ document.addEventListener('keydown', (e) => {
 
 document.addEventListener('input', (e) => { if (e.target.id === 'user-search') renderPicker(); });
 
-/* Cocher / décocher une personne : l'accès est mis à jour immédiatement */
-document.addEventListener('change', async (e) => {
+/* Cocher / décocher une personne dans la fenêtre d'ajout (validé avec le bouton « Ajouter ») */
+document.addEventListener('change', (e) => {
   const c = e.target.closest('input[data-uid]'); if (!c) return;
-  const uid = c.dataset.uid, want = c.checked;
-  try {
-    await updateDoc(doc(db, 'lists', currentListId), { allowedUids: want ? arrayUnion(uid) : arrayRemove(uid) });
-    want ? currentAllowed.add(uid) : currentAllowed.delete(uid);
-    $('#allowed-count').textContent = currentAllowed.size;
-  } catch (err) { c.checked = !want; toast('Modification impossible pour le moment'); }
+  c.checked ? pendingAdd.add(c.dataset.uid) : pendingAdd.delete(c.dataset.uid);
+  updateAddButton();
 });
 
 document.addEventListener('click', async (e) => {
-  if (e.target.id === 'create-dialog') { e.target.close(); return; }   // clic sur le fond : ferme la fenêtre
+  /* Clic sur le fond assombri (hors de la fenêtre) : ferme la fenêtre */
+  if (e.target.tagName === 'DIALOG') {
+    const r = e.target.getBoundingClientRect();
+    if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) e.target.close();
+    return;
+  }
   /* Le menu se ferme au clic en dehors, ou après le choix d'une entrée */
   if (!e.target.closest('#authbar') || e.target.closest('#menu a, #menu button')) closeMenu();
   const b = e.target.closest('[data-action]'); if (!b) return;
@@ -619,7 +703,27 @@ document.addEventListener('click', async (e) => {
     if (act === 'open-create') { const d = $('#create-dialog'); d.showModal(); d.querySelector('input')?.focus(); }
     if (act === 'close-create') $('#create-dialog').close();
     if (act === 'copy') toast(await copyText(shareUrl(currentListId)) ? 'Lien copié 📋' : 'Sélectionne le lien et copie-le');
-    if (act === 'refresh-users') { await loadUsers(); renderPicker(); toast('Liste des personnes actualisée'); }
+    if (act === 'close-dialog') b.closest('dialog').close();
+    if (act === 'open-edit-list') {
+      const d = $('#edit-list-dialog');
+      d.querySelector('[name=titre]').value = currentList.titre || '';
+      d.querySelector('[name=message]').value = currentList.message || '';
+      d.showModal(); d.querySelector('[name=titre]').focus();
+    }
+    if (act === 'open-add-people') {
+      try { await loadUsers(); } catch (err) { /* on garde la liste déjà chargée */ }   // récupère les nouveaux inscrits
+      pendingAdd = new Set(); $('#user-search').value = '';
+      renderPicker();
+      const d = $('#add-people-dialog'); d.showModal(); $('#user-search').focus();
+    }
+    if (act === 'remove-person') {
+      const uid = b.dataset.uid, nom = usersById[uid] || 'cette personne';
+      if (confirm('Retirer l’accès de ' + nom + ' à ta liste ?')) {
+        await updateDoc(doc(db, 'lists', currentListId), { allowedUids: arrayRemove(uid) });
+        currentAllowed.delete(uid); renderAccess();
+        toast('Accès retiré');
+      }
+    }
     if (act === 'edit') {
       const g = currentGifts.find(x => x.id === gid); if (!g) return;
       const f = document.querySelector('form[data-form="gift"]');
