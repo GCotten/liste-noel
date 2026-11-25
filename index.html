@@ -32,8 +32,21 @@
   header.top .inner { max-width: 760px; margin: 0 auto; display: flex; justify-content: space-between;
                       align-items: center; gap: 12px; flex-wrap: wrap; }
   header.top a.brand { color: #fff; text-decoration: none; font-weight: 700; font-size: 1.15rem; }
-  #authbar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-  #authbar .btn { background: rgba(255,255,255,.15); color: #fff; border-color: rgba(255,255,255,.4); }
+  #authbar { position: relative; }
+  .menu-btn { width: 42px; height: 42px; padding: 0; display: inline-flex; flex-direction: column;
+              justify-content: center; align-items: center; gap: 5px; cursor: pointer;
+              background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.4); border-radius: 10px; }
+  .menu-btn:hover { background: rgba(255,255,255,.25); }
+  .menu-btn span { display: block; width: 20px; height: 2px; background: #fff; border-radius: 2px; }
+  #menu { position: absolute; right: 0; top: calc(100% + 8px); z-index: 20; min-width: 230px;
+          background: var(--card); color: var(--ink); border: 1px solid var(--line);
+          border-radius: var(--radius); box-shadow: var(--shadow); padding: 6px; }
+  #menu[hidden] { display: none; }
+  #menu .menu-user { padding: 10px 14px; color: var(--muted); font-size: .88rem; border-bottom: 1px solid var(--line); margin-bottom: 4px; }
+  #menu a, #menu button { display: block; width: 100%; text-align: left; padding: 12px 14px; font: inherit;
+          color: var(--ink); background: none; border: 0; border-radius: 8px; cursor: pointer; text-decoration: none; }
+  #menu a:hover, #menu button:hover { background: var(--gold-soft); }
+  #menu button.logout { color: var(--red); font-weight: 600; }
   main { max-width: 760px; margin: 0 auto; padding: 20px 16px 60px; }
   footer { text-align: center; color: var(--muted); font-size: .85rem; padding: 0 16px 40px; }
 
@@ -96,6 +109,13 @@
   .banner { background: var(--gold-soft); color: var(--ink); border: 1px solid var(--gold);
             border-radius: 10px; padding: 10px 14px; margin-bottom: 16px; font-size: .92rem; }
   .section-title { margin: 26px 0 12px; font-size: 1.15rem; }
+  .list-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 26px 0 12px; }
+  .list-head h2 { font-size: 1.15rem; margin: 0; }
+  .btn.icon { width: 40px; height: 40px; padding: 0; justify-content: center; font-size: 1.6rem; line-height: 1; }
+  dialog { width: min(480px, calc(100% - 32px)); background: var(--card); color: var(--ink);
+           border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); }
+  dialog::backdrop { background: rgba(20, 10, 8, .55); }
+  dialog h2 { font-size: 1.2rem; margin-bottom: 4px; }
   .g-logo { width: 18px; height: 18px; flex: none; }
   ol.steps { padding-left: 20px; } ol.steps li { margin-bottom: 6px; }
 
@@ -196,11 +216,24 @@ async function loadUsers() {
   s.docs.forEach(d => { usersById[d.id] = String(d.data().name || 'Sans nom'); });
 }
 
+/* Menu en haut à droite : bouton à 3 tirets + liste (accueil, profil, déconnexion) */
 function renderAuthBar() {
-  $('#authbar').innerHTML = (user && profile)
-    ? `<a class="btn small" href="#/profil" title="Modifier mon nom">👤 ${esc(profile.name)}</a>
-       <button class="btn small" data-action="logout">Se déconnecter</button>`
-    : (user ? `<button class="btn small" data-action="logout">Se déconnecter</button>` : '');
+  if (!user) { $('#authbar').innerHTML = ''; return; }
+  $('#authbar').innerHTML = `
+    <button class="menu-btn" id="menu-btn" data-action="toggle-menu" aria-label="Menu"
+            aria-haspopup="true" aria-expanded="false" aria-controls="menu">
+      <span></span><span></span><span></span>
+    </button>
+    <div id="menu" role="menu" hidden>
+      ${profile ? `<div class="menu-user">Connecté en tant que <strong>${esc(profile.name)}</strong></div>
+      <a role="menuitem" href="#/">🏠 Accueil</a>
+      <a role="menuitem" href="#/profil">👤 Mon profil</a>` : ''}
+      <button role="menuitem" class="logout" data-action="logout">Se déconnecter</button>
+    </div>`;
+}
+function closeMenu() {
+  const m = $('#menu'); if (!m) return;
+  m.hidden = true; $('#menu-btn')?.setAttribute('aria-expanded', 'false');
 }
 
 /* =====================================================
@@ -271,22 +304,30 @@ async function routeHome(token) {
         <li class="gift"><div class="main"><h3>${esc(l.titre)}</h3><p>Liste de ${esc(usersById[l.ownerUid] || 'un proche')}</p></div>
         <div class="actions"><a class="btn small primary" href="#/l/${esc(l.id)}">Voir la liste</a></div></li>`).join('')}</ul>` : ''}
 
-    <section class="card hero" style="${shared.length ? 'margin-top:26px' : ''}">
-      <h1>Créer ma liste 🎄</h1>
+    <div class="list-head" style="${shared.length ? '' : 'margin-top:0'}">
+      <h2>Mes listes</h2>
+      <button class="btn primary icon" data-action="open-create" aria-label="Créer une liste" title="Créer une liste">+</button>
+    </div>
+    ${mine.length ? `<ul class="gifts">${mine.map(l => `
+      <li class="gift"><div class="main"><h3>${esc(l.titre)}</h3>
+        <p>${(l.allowedUids || []).length} personne${(l.allowedUids || []).length > 1 ? 's' : ''} ${(l.allowedUids || []).length ? 'ont' : 'a'} accès</p></div>
+      <div class="actions"><a class="btn small primary" href="#/liste/${esc(l.id)}">Ouvrir</a></div></li>`).join('')}</ul>`
+      : '<div class="empty">Tu n’as pas encore de liste. Clique sur + pour créer la première 🎄</div>'}
+
+    <dialog id="create-dialog" aria-labelledby="create-title">
+      <h2 id="create-title">Créer une liste 🎄</h2>
       <p class="lead">Donne-lui un titre, ajoute tes envies, puis choisis qui peut la voir.</p>
       <form data-form="create-list" novalidate>
         <label for="l-titre">Titre de la liste *</label>
         <input id="l-titre" name="titre" required maxlength="120" placeholder="Ex : Noël 2026">
         <label for="l-msg">Message d’accueil</label>
         <textarea id="l-msg" name="message" maxlength="500" placeholder="Un petit mot pour tes proches…"></textarea>
-        <div class="btn-row"><button class="btn primary" type="submit">Créer ma liste</button></div>
+        <div class="btn-row">
+          <button class="btn primary" type="submit">Créer ma liste</button>
+          <button class="btn" type="button" data-action="close-create">Annuler</button>
+        </div>
       </form>
-    </section>
-
-    ${mine.length ? `<h2 class="section-title">Mes listes</h2><ul class="gifts">${mine.map(l => `
-      <li class="gift"><div class="main"><h3>${esc(l.titre)}</h3>
-        <p>${(l.allowedUids || []).length} personne${(l.allowedUids || []).length > 1 ? 's' : ''} ${(l.allowedUids || []).length ? 'ont' : 'a'} accès</p></div>
-      <div class="actions"><a class="btn small primary" href="#/liste/${esc(l.id)}">Ouvrir</a></div></li>`).join('')}</ul>` : ''}`;
+    </dialog>`;
 }
 
 /* ----- Vue propriétaire ----- */
@@ -545,6 +586,10 @@ app.addEventListener('submit', async (e) => {
   } catch (err) { toast('Enregistrement impossible (règles Firestore ?)'); }
 });
 
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && $('#menu') && !$('#menu').hidden) { closeMenu(); $('#menu-btn')?.focus(); }
+});
+
 document.addEventListener('input', (e) => { if (e.target.id === 'user-search') renderPicker(); });
 
 /* Cocher / décocher une personne : l'accès est mis à jour immédiatement */
@@ -559,11 +604,20 @@ document.addEventListener('change', async (e) => {
 });
 
 document.addEventListener('click', async (e) => {
+  if (e.target.id === 'create-dialog') { e.target.close(); return; }   // clic sur le fond : ferme la fenêtre
+  /* Le menu se ferme au clic en dehors, ou après le choix d'une entrée */
+  if (!e.target.closest('#authbar') || e.target.closest('#menu a, #menu button')) closeMenu();
   const b = e.target.closest('[data-action]'); if (!b) return;
   const act = b.dataset.action, gid = b.dataset.id;
   try {
     if (act === 'login') await signInWithPopup(auth, new GoogleAuthProvider());
     if (act === 'logout') { await signOut(auth); location.hash = '#/'; }
+    if (act === 'toggle-menu') {
+      const m = $('#menu'), willOpen = m.hidden;
+      m.hidden = !willOpen; b.setAttribute('aria-expanded', String(willOpen));
+    }
+    if (act === 'open-create') { const d = $('#create-dialog'); d.showModal(); d.querySelector('input')?.focus(); }
+    if (act === 'close-create') $('#create-dialog').close();
     if (act === 'copy') toast(await copyText(shareUrl(currentListId)) ? 'Lien copié 📋' : 'Sélectionne le lien et copie-le');
     if (act === 'refresh-users') { await loadUsers(); renderPicker(); toast('Liste des personnes actualisée'); }
     if (act === 'edit') {
